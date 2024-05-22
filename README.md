@@ -55,7 +55,7 @@ sudo ./easyrsa gen-req userver nopass
 ```
 ## Firmar la clave .req con el CA para generar certificado .crt
 ``` bash
-sudo ./easyrsa sing-req server userver
+sudo ./easyrsa sign-req server userver
 ```
 este pedirá la contraseña al momendo de crear el CA
 
@@ -89,7 +89,7 @@ sudo ./easyrsa gen-req cliente1-userver nopass
 ```
 ## Firmar la clave .req con el CA para generar certificado .crt
 ```bash
-sudo ./easyrsa sing-req cliente cliente1-userver
+sudo ./easyrsa sign-req cliente cliente1-userver
 ```
 ## Mover las claves privada, publica y el certificado a la carpeta creada para el cliente
 ```bash
@@ -229,9 +229,9 @@ net.ipv4.ip_forward = 1
 iptables -t nat -I POSTROUTING 1 -S 10.8.0.0/24 -0 enp0s3 -j MASQUERADE
 
 iptables -I INPUT 1 -i tun0 -j ACCEPT
-iptables -I FORWARD 1 -o tun0 -j ACCEPT
-iptables -I FORWARD 1 -o enp0s3 -j ACCEPT
-iptables -I INPUT 1 -i enp0s3 -p udp --dport 1194  -j ACCEPT
+iptables -I FORWARD 1 -i enp0s3 -o tun0 -j ACCEPT
+iptables -I FORWARD 1 -i tun0 -o enp0s3 -j ACCEPT
+iptables -I INPUT 1 -i enp0s3 -p udp --dport 1194 -j ACCEPT
 ```
 ## Instalando iptables-persistent
 ```bash
