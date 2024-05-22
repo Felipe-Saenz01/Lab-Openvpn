@@ -1,4 +1,4 @@
-<h1 align="center" >Sistema Votaciones virtuales - Unitropico</h1></br>
+<h1 align="center" >Laboratorio OpenVPN - Unitropico</h1></br>
 <p align="center"><a href="https://unitropico.edu.co" target="_blank"><img src="https://i.postimg.cc/GtJMcSLD/LOGO-1024x601.png" width=35% alt="Unitropico Logo"></a></p></br>
 <p>El taller/Laboratorio de la materia redes convergentes, se siguió el siguiente tutorial para realizar la practica.</p>
 - link: https://youtu.be/P7i-oLe2bHk?si=Et1nWIOoXDx15IkF
@@ -182,4 +182,62 @@ verb 3
 # 25. NOTIFICACION DE REINICIO
 explicit-exist-nofify 1
 ```
+## Mover fichero cliente
+```bash
+sudo cp /usr/share/doc/openvpn/examples/sample-config-files/client.conf /etc/openvpn/server
+```
+## Modificando fichero cliente
+```conf
+client
+remote my-server-1 1194
+;remote my-server-2 1194
 
+proto udp
+
+dev  tun
+
+;remote-random
+
+resolv-retry infinite
+
+nobind
+
+user nobody
+group nogroup
+persist-key
+persist-tun
+
+;http-proxy-rety # retry on connection failures
+;http-proxy [proxy server] [ proxy port #]
+
+;ca ca.crt
+;cert client.crt
+;key client.key
+;tls-auth ta.key 1
+
+cipher AES-256-GCM
+auth SHA512
+```
+
+## Habilidanto net.ipv4.ip_forward en ./etc/sysctl.con
+```bash
+sysctl -p
+net.ipv4.ip_forward = 1
+```
+## Configurando reglas de firewall con iptables
+```bash
+iptables -t nat -I POSTROUTING 1 -S 10.8.0.0/24 -0 enp0s3 -j MASQUERADE
+
+iptables -I INPUT 1 -i tun0 -j ACCEPT
+iptables -I FORWARD 1 -o tun0 -j ACCEPT
+iptables -I FORWARD 1 -o enp0s3 -j ACCEPT
+iptables -I INPUT 1 -i enp0s3 -p udp --dport 1194  -j ACCEPT
+```
+## Instalando iptables-persistent
+```bash
+sudo apt install iptables-persistent -y
+```
+## Guardando reglas de firewall con netfilter-persistent save
+```bash
+netfilter-persistent save
+```
